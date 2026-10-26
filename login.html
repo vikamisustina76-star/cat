@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffb8d2">
+  <title>Вход — Pixel Cat Club</title>
+  <link rel="stylesheet" href="auth.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="supabase-config.js" defer></script>
+  <script src="auth-page.js" defer></script>
+</head>
+<body>
+  <main class="auth-shell">
+    <a class="auth-brand" href="index.html">♥ PIXEL CAT CLUB</a>
+    <section class="auth-card">
+      <div class="auth-cat">ฅ^•ﻌ•^ฅ</div>
+      <p class="auth-eyebrow">YOUR LITTLE PIXEL WORLD</p>
+      <h1 id="auth-title">С возвращением!</h1>
+      <p class="auth-intro" id="auth-intro">Войди в аккаунт, чтобы продолжить своё приключение.</p>
+      <div class="auth-tabs">
+        <button type="button" data-auth-mode="login" class="auth-tab active">ВХОД</button>
+        <button type="button" data-auth-mode="signup" class="auth-tab">РЕГИСТРАЦИЯ</button>
+      </div>
+      <form id="auth-form">
+        <label for="email">ЭЛЕКТРОННАЯ ПОЧТА</label>
+        <input id="email" type="email" autocomplete="email" placeholder="cat@example.com" required>
+        <label for="password">ПАРОЛЬ</label>
+        <input id="password" type="password" autocomplete="current-password" minlength="8" placeholder="Минимум 8 символов" required>
+        <div id="confirm-wrap" hidden>
+          <label for="password-confirm">ПОВТОРИ ПАРОЛЬ</label>
+          <input id="password-confirm" type="password" autocomplete="new-password" minlength="8">
+        </div>
+        <button class="auth-primary" id="email-submit" type="submit">ВОЙТИ ♥</button>
+      </form>
+      <button type="button" id="forgot-password" class="auth-link">Забыли пароль?</button>
+      <div class="auth-divider"><span>ИЛИ ВОЙТИ ЧЕРЕЗ</span></div>
+      <div class="social-buttons">
+        <button class="social-button telegram-button" type="button" data-provider="telegram"><span>➤</span> TELEGRAM</button>
+        <button class="social-button vk-button" type="button" data-provider="vk"><span>ᴠ</span> VK ID</button>
+      </div>
+      <form id="reset-form" hidden>
+        <label for="new-password">НОВЫЙ ПАРОЛЬ</label>
+        <input id="new-password" type="password" minlength="8" autocomplete="new-password" required>
+        <button class="auth-primary" type="submit">СОХРАНИТЬ ПАРОЛЬ</button>
+      </form>
+      <p id="auth-message" class="auth-message" aria-live="polite"></p>
+      <p class="auth-small">Демо-игра доступна без аккаунта. Для онлайн-входа настрой Supabase и провайдеров.</p>
+      <a class="auth-demo-link" href="index.html?demo=1">Продолжить в демо-режиме</a>
+    </section>
+    <p class="auth-footer">MADE WITH ♥ AND CAT HAIR</p>
+  </main>
+</body>
+</html>

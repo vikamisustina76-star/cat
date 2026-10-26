@@ -1,64 +1,223 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мысли твоего кота 🐱</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffb8d2">
+  <meta name="description" content="Pixel Cat Club — уютная пиксельная игра с котиком.">
+  <title>Pixel Cat Club 🐱</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="supabase-config.js" defer></script>
+  <script src="auth-guard.js" defer></script>
 </head>
-<body>
+<body data-theme="day">
+  <header class="topbar">
+    <a class="brand" href="#" data-view="view-game"><span class="brand-icon">♥</span><span>PIXEL CAT</span></a>
+    <div class="header-stats">
+      <div class="stat-box"><span>★ LVL</span><strong id="header-level">1</strong></div>
+      <div class="stat-box coin-stat"><span class="coin-symbol">◆</span><strong id="coin-count">0</strong></div>
+      <div id="account-controls" class="account-controls"><a class="account-login" href="login.html">ВОЙТИ</a></div>
+    </div>
+  </header>
 
-    <div class="top-bar">
-        <div class="counter">💖 Уровень любви: <span id="score">0</span></div>
-        <div class="hint">Погладь котика</div>
+  <main class="main-content">
+    <div id="setup-notice" class="notice setup-notice" hidden>
+      <strong>Демо-режим</strong>
+      <span>Игра работает локально. Подключи Supabase в <code>supabase-config.js</code>, чтобы включить аккаунты и облачное сохранение.</span>
+      <a href="README.md">Инструкция</a>
     </div>
 
-    <div class="game-container" id="pet-area">
-        <div class="thought-bubble" id="bubble">
-            Мурр? Нажми на меня, Лиза...
+    <section class="view active" id="view-game">
+      <div class="intro">
+        <p class="eyebrow">A LITTLE PIXEL WORLD</p>
+        <h1>Твой маленький<br><span>мир котика</span></h1>
+        <p class="subtitle">Погладь. Исследуй. Собери всё самое милое.</p>
+      </div>
+
+      <section class="game-panel" id="game-panel" aria-label="Игровая сцена">
+        <div class="game-topline">
+          <span class="player-label"><span class="player-dot"></span> PLAYER 01</span>
+          <span class="location-chip" id="current-world-label">УЮТНАЯ КОМНАТА</span>
+          <span class="weather-label" id="weather-label">☀ ЯСНО</span>
         </div>
-
-        <div class="cat-wrapper">
-            <svg xmlns="http://w3.org" viewBox="0 0 100 100" width="100%" height="100%">
-                <defs>
-                    <linearGradient id="catGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#f3efff"/>
-                        <stop offset="100%" stop-color="#cfc7ec"/>
-                    </linearGradient>
-                    <linearGradient id="bellyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#ffffff"/>
-                        <stop offset="100%" stop-color="#f5f2ff"/>
-                    </linearGradient>
-                </defs>
-                <path d="M75,70 Q88,68 85,50 Q82,35 88,32 Q92,30 90,38 Q85,55 74,62" fill="#c1b9db" />
-                <ellipse cx="70" cy="76" rx="9" ry="7" fill="#baaed6" />
-                <ellipse cx="48" cy="64" rx="29" ry="21" fill="url(#catGrad)" />
-                <ellipse cx="44" cy="67" rx="19" ry="13" fill="url(#bellyGrad)" />
-                <ellipse cx="32" cy="80" rx="6" ry="5" fill="#c1b9db" />
-                <ellipse cx="46" cy="80" rx="6" ry="5" fill="#c1b9db" />
-                <g class="ear-l">
-                    <polygon points="23,34 18,14 36,26" fill="#c1b9db" />
-                    <polygon points="25,31 21,19 33,25" fill="#ffb6c1" />
-                </g>
-                <g class="ear-r">
-                    <polygon points="53,26 71,14 66,34" fill="#c1b9db" />
-                    <polygon points="56,25 68,19 64,31" fill="#ffb6c1" />
-                </g>
-                <circle cx="44" cy="39" r="17" fill="url(#catGrad)" />
-                <circle cx="31" cy="44" r="3" fill="#ffb6c1" opacity="0.6"/>
-                <circle cx="57" cy="44" r="3" fill="#ffb6c1" opacity="0.6"/>
-                <circle class="eye eye-left" cx="37" cy="38" r="2" fill="#3a2a3a" />
-                <circle class="eye eye-right" cx="51" cy="38" r="2" fill="#3a2a3a" />
-                <circle class="eye eye-left" cx="36.5" cy="37" r="0.7" fill="#fff" />
-                <circle class="eye eye-right" cx="50.5" cy="37" r="0.7" fill="#fff" />
-                <polygon points="43,42 45,42 44,43.5" fill="#ff9ebb" />
-                <path d="M41,45 Q44,47 44,45 Q44,47 47,45" fill="none" stroke="#3a2a3a" stroke-width="1.2" stroke-linecap="round"/>
-            </svg>
+        <div class="game-world" id="game-world" data-location="room" data-weather="sun" data-theme="day">
+          <div class="weather-layer" id="weather-layer" aria-hidden="true"></div>
+          <span class="decor decor-star star-one">✦</span>
+          <span class="decor decor-heart heart-one">♥</span>
+          <span class="decor decor-star star-two">✧</span>
+          <span class="decor decor-heart heart-two">♥</span>
+          <span class="decor decor-flower flower-one">✿</span>
+          <span class="decor decor-flower flower-two">✿</span>
+          <div class="thought-bubble" id="thought-bubble" aria-live="polite">
+            <span class="bubble-label">МЫСЛИ КОТИКА</span>
+            <p id="thought-text">Мяу! Погладь меня 💗</p>
+            <span class="bubble-tail"></span>
+          </div>
+          <button class="secret-item" id="secret-item" type="button" hidden aria-label="Найти секретный предмет">✨</button>
+          <button class="cat-button" id="pet-button" type="button" aria-label="Погладить пиксельного котика">
+            <svg id="pixel-cat" class="pixel-cat" viewBox="0 0 160 160" role="img" aria-label="Пиксельный котик"></svg>
+            <span class="pet-hint">♥ ПОГЛАДИТЬ КОТИКА ♥</span>
+          </button>
+          <div class="ground" aria-hidden="true"><span>✿</span><span>✿</span><span>✿</span><span>✿</span><span>✿</span><span>✿</span></div>
+          <div class="scene-caption"><span>♡</span><span id="scene-caption-text">Место, где живёт уют</span></div>
+          <div class="fullscreen-tools" aria-label="Управление полноэкранной игрой">
+            <div class="fullscreen-topline"><span id="fullscreen-location">УЮТНАЯ КОМНАТА</span><button class="fullscreen-icon" id="full-exit" type="button">✕ ВЫХОД</button></div>
+            <div class="fullscreen-bottomline">
+              <button class="fullscreen-icon" id="full-prev" type="button" aria-label="Предыдущий мир">◀</button>
+              <button class="fullscreen-icon" id="full-theme" type="button">☾ НОЧЬ</button>
+              <button class="fullscreen-icon" id="full-pet" type="button">♥ ПОГЛАДИТЬ</button>
+              <button class="fullscreen-icon" id="full-next" type="button" aria-label="Следующий мир">▶</button>
+            </div>
+          </div>
         </div>
-    </div>
+        <div class="game-footer">
+          <span>LVL <strong id="level">01</strong></span>
+          <div class="xp-track" id="xp-progress" role="progressbar" aria-label="Опыт до следующего уровня" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0"><span id="xp-fill"></span></div>
+          <span><strong id="xp-count">0</strong>/<span id="xp-needed">50</span> XP</span>
+        </div>
+      </section>
 
-    <div class="author-watermark">создал:@Blooody11</div>
+      <section class="care-strip" aria-label="Уход за котиком">
+        <div class="care-meter">
+          <div class="care-meter-heading"><span>🍓 СЫТОСТЬ КОТИКА</span><strong id="fullness-label">100%</strong></div>
+          <div class="care-track"><span id="fullness-fill"></span></div>
+          <p id="care-status">Котик доволен и полон сил 💗</p>
+        </div>
+        <button class="pixel-button feed-button" id="feed-cat" type="button">🥣 ПОКОРМИТЬ</button>
+      </section>
 
-    <script src="script.js"></script>
+      <div class="quick-actions">
+        <button class="pixel-button primary-button" id="pet-again" type="button">♥ ПОГЛАДИТЬ</button>
+        <button class="pixel-button action-button" id="weather-button" type="button">☀ ПОГОДА</button>
+        <button class="pixel-button action-button" id="fullscreen-button" type="button">⛶ НА ВЕСЬ ЭКРАН</button>
+        <button class="pixel-button action-button" id="minigame-open" type="button">🎮 МИНИ-ИГРА</button>
+      </div>
+
+      <button class="daily-peek" id="go-quests" type="button">
+        <span class="daily-peek-icon">🎁</span>
+        <span class="daily-peek-copy"><strong>Твой ежедневный подарок</strong><small id="daily-peek-text">Загляни за наградой дня!</small></span>
+        <span class="daily-peek-arrow">→</span>
+      </button>
+    </section>
+
+    <section class="view" id="view-cat">
+      <div class="page-heading"><p class="section-kicker">01 / YOUR CAT</p><h2>Стиль котика</h2><p>Выбирай любимые цвета и примеряй новые образы.</p></div>
+      <div class="mini-preview panel">
+        <div class="mini-preview-sky"><span>✦</span><span>♡</span><span>✧</span></div>
+        <div class="mini-preview-cat"><svg id="preview-cat" viewBox="0 0 160 160" aria-label="Предпросмотр котика"></svg></div>
+        <div class="mini-preview-label"><strong id="preview-name">РЫЖИЙ КОТИК</strong><span id="preview-accessory">Без аксессуара</span></div>
+      </div>
+      <section class="panel">
+        <div class="section-heading"><div><p class="section-kicker">SKINS</p><h2>Коллекция скинов</h2></div><span class="heading-icon">🎨</span></div>
+        <div class="skin-options">
+          <button class="skin-option" data-skin="orange" type="button"><span class="skin-swatch orange-swatch"></span><span>Рыжий</span></button>
+          <button class="skin-option" data-skin="cream" type="button"><span class="skin-swatch cream-swatch"></span><span>Кремовый</span></button>
+          <button class="skin-option" data-skin="black" type="button"><span class="skin-swatch black-swatch"></span><span>Чёрный</span></button>
+          <button class="skin-option" data-skin="pink" type="button"><span class="skin-swatch pink-swatch"></span><span>Розовый</span></button>
+          <button class="skin-option" data-skin="calico" type="button"><span class="skin-swatch calico-swatch"></span><span>Трёхцветный</span></button>
+        </div>
+        <p class="helper-text">Трёхцветный скин открывается на 3-м уровне.</p>
+      </section>
+      <section class="panel">
+        <div class="section-heading"><div><p class="section-kicker">DAY & NIGHT</p><h2>Настроение мира</h2></div><span class="heading-icon">🌙</span></div>
+        <div class="segmented"><button class="segment-button" id="day-button" type="button">☀ День</button><button class="segment-button" id="night-button" type="button">☾ Ночь</button></div>
+      </section>
+      <section class="panel">
+        <div class="section-heading"><div><p class="section-kicker">ACCESSORIES</p><h2>Твой образ</h2></div><button class="text-button" data-view="view-shop" type="button">В МАГАЗИН →</button></div>
+        <p class="panel-description">Выбери аксессуар в магазине — сначала можно примерить его бесплатно.</p>
+        <div id="equipped-summary" class="equipped-summary">Без аксессуара</div>
+      </section>
+    </section>
+
+    <section class="view" id="view-shop">
+      <div class="page-heading"><p class="section-kicker">02 / PIXEL BOUTIQUE</p><h2>Магазин котика</h2><p>Примеряй вещи, покупай понравившиеся и создавай свой стиль.</p></div>
+      <div class="shop-balance"><div class="shop-balance-icon">◆</div><div><small>ТВОИ МОНЕТКИ</small><strong id="shop-coins">0</strong></div><button class="pixel-button small-button" data-view="view-quests" type="button">ЗАРАБОТАТЬ +</button></div>
+      <div class="shop-filters" aria-label="Фильтр магазина">
+        <button class="filter-button selected" data-shop-filter="all" type="button">ВСЁ</button>
+        <button class="filter-button" data-shop-filter="head" type="button">НА ГОЛОВУ</button>
+        <button class="filter-button" data-shop-filter="neck" type="button">НА ШЕЮ</button>
+        <button class="filter-button" data-shop-filter="other" type="button">ДРУГОЕ</button>
+      </div>
+      <div id="accessory-shop" class="accessory-grid"></div>
+      <p class="helper-text shop-hint">«Примерить» показывает аксессуар на котике и не тратит монетки.</p>
+    </section>
+
+    <section class="view" id="view-worlds">
+      <div class="page-heading"><p class="section-kicker">03 / EXPLORE</p><h2>Миры котика</h2><p>В каждом месте своя атмосфера, мысли и секретный предмет.</p></div>
+      <div class="current-world-card panel">
+        <div class="world-card-art" id="world-card-art"><span id="location-icon">🏡</span></div>
+        <div class="current-world-copy"><p class="section-kicker">ТЕКУЩАЯ ЛОКАЦИЯ</p><h3 id="location-name">УЮТНАЯ КОМНАТА</h3><p id="location-description">Самое время поспать!</p><span id="world-count" class="world-count">МИР 1 / 5</span></div>
+      </div>
+      <div class="world-controls"><button id="prev-location" class="pixel-button secondary-button" type="button">← НАЗАД</button><button id="next-location" class="pixel-button secondary-button" type="button">ДАЛЬШЕ →</button></div>
+      <div id="world-grid" class="world-grid"></div>
+      <section class="panel">
+        <div class="section-heading"><div><p class="section-kicker">WEATHER</p><h2>Погода</h2></div><span class="heading-icon">☁️</span></div>
+        <p class="panel-description">Включай солнце, дождь или снег и наблюдай за пиксельным миром.</p>
+        <div class="weather-options"><button class="weather-option" data-weather="sun" type="button">☀ Солнечно</button><button class="weather-option" data-weather="rain" type="button">☔ Дождь</button><button class="weather-option" data-weather="snow" type="button">❄ Снег</button></div>
+      </section>
+    </section>
+
+    <section class="view" id="view-quests">
+      <div class="page-heading"><p class="section-kicker">04 / YOUR ADVENTURE</p><h2>Приключения</h2><p>Выполняй задания, собирай монетки и открывай награды.</p></div>
+      <section class="daily-reward-card"><div class="daily-gift-art">🎁</div><div class="daily-reward-copy"><p class="section-kicker">DAILY GIFT</p><h3>Подарок дня</h3><p id="daily-reward-description">Заглядывай каждый день за сюрпризом!</p><span class="streak-label" id="daily-streak">🔥 Серия: 1 день</span></div><button class="pixel-button primary-button" id="daily-reward-button" type="button">ЗАБРАТЬ</button></section>
+      <section class="panel"><div class="section-heading"><div><p class="section-kicker">DAILY MISSIONS</p><h2>Задания дня</h2></div><span class="heading-icon">📋</span></div><p class="panel-description">Выполняй задания и получай награды.</p><div id="daily-quests" class="daily-quests"></div></section>
+      <section class="panel" id="achievement-panel"><div class="section-heading"><div><p class="section-kicker">YOUR TROPHIES</p><h2>Достижения</h2></div><span class="heading-icon">🏆</span></div><div class="achievement-progress"><div class="achievement-progress-track"><span id="achievement-progress-fill"></span></div><span id="achievement-counter">0 / 9</span></div><div id="achievements-list" class="achievements-grid"></div></section>
+      <details class="panel collection-panel" id="collection-details"><summary><span>КОЛЛЕКЦИЯ МЫСЛЕЙ</span><strong id="thought-count">0 найдено</strong></summary><p class="panel-description">Все фразы, которые котик успел тебе рассказать.</p><div id="thought-collection" class="thought-collection"></div></details>
+      <section class="panel"><div class="section-heading"><div><p class="section-kicker">YOUR JOURNEY</p><h2>Статистика</h2></div><span class="heading-icon">✨</span></div><div class="stats-grid"><div class="stats-tile"><span>ПОГЛАЖИВАНИЙ</span><strong id="total-pets">0</strong></div><div class="stats-tile"><span>МИНИ-ИГРЫ</span><strong id="games-played">0</strong></div><div class="stats-tile"><span>МИРЫ</span><strong id="worlds-visited">1 / 5</strong></div><div class="stats-tile"><span>СКИНЫ</span><strong id="skins-count">4</strong></div><div class="stats-tile"><span>СЕКРЕТЫ</span><strong id="secrets-count">0 / 5</strong></div><div class="stats-tile"><span>РЕКОРД АРКАДЫ</span><strong id="arcade-record">0</strong></div></div></section>
+    </section>
+
+    <section class="view" id="view-more">
+      <div class="page-heading"><p class="section-kicker">05 / PREFERENCES</p><h2>Ещё и настройки</h2><p>Настрой игру под себя и сохрани резервную копию прогресса.</p></div>
+      <section class="panel"><div class="section-heading"><div><p class="section-kicker">SOUND</p><h2>Звук и музыка</h2></div><span class="heading-icon">♫</span></div>
+        <div class="setting-line"><div><strong>Звуковые эффекты</strong><p>Мяу и игровые сигналы</p></div><button id="sound-toggle" class="pixel-button toggle-button" type="button">ЗВУК: ВКЛ</button></div>
+        <div class="setting-line"><div><strong>Фоновая музыка</strong><p>Тихая ретро-мелодия</p></div><button id="music-toggle" class="pixel-button toggle-button" type="button">МУЗЫКА: ВЫКЛ</button></div>
+        <div class="volume-control"><label for="volume-slider">ГРОМКОСТЬ <strong id="volume-value">50%</strong></label><input id="volume-slider" type="range" min="0" max="100" step="5" value="50"></div>
+        <div class="setting-line"><div><strong>Автосмена погоды</strong><p>Погода меняется раз в полторы минуты</p></div><input id="auto-weather" type="checkbox" checked></div>
+        <div class="setting-line"><div><strong>Меньше анимаций</strong><p>Сокращает движение в игре</p></div><input id="reduce-motion" type="checkbox"></div>
+      </section>
+      <section class="panel"><div class="section-heading"><div><p class="section-kicker">NOTIFICATIONS</p><h2>Уведомления</h2></div><span class="heading-icon">🔔</span></div>
+        <div class="setting-line"><div><strong>Напоминания о котике</strong><p id="notification-status">Разреши уведомления, чтобы получать напоминания.</p></div><button class="pixel-button toggle-button" id="notifications-toggle" type="button">ВКЛЮЧИТЬ</button></div>
+        <div class="setting-line"><div><strong>Частота напоминаний</strong><p>Как часто котик будет о себе напоминать</p></div><select id="reminder-interval" class="notification-select"><option value="60">Каждый час</option><option value="120">Каждые 2 часа</option></select></div>
+        <div class="setting-line"><div><strong>Новости обновлений</strong><p>Сообщать о новых версиях игры</p></div><input id="update-notifications" type="checkbox" checked></div>
+      </section>
+      <section class="panel"><div class="section-heading"><div><p class="section-kicker">SAVE FILE</p><h2>Резервная копия</h2></div><span class="heading-icon">💾</span></div><p class="panel-description">Сохрани прогресс в JSON-файл, чтобы перенести игру на другое устройство.</p><button class="pixel-button primary-button wide-button" id="export-save" type="button">↓ СОХРАНИТЬ КОПИЮ</button><label class="pixel-button import-button wide-button" for="import-save">↑ ЗАГРУЗИТЬ КОПИЮ</label><input id="import-save" type="file" accept=".json,application/json" hidden><p class="helper-text">При импорте текущий локальный прогресс будет заменён.</p></section>
+      <section class="panel"><div class="section-heading"><div><p class="section-kicker">RESET</p><h2>Начать заново</h2></div><span class="heading-icon">↻</span></div><p class="panel-description">Сбросит уровни, монетки, покупки, достижения, секреты и задания.</p><button class="pixel-button danger-button wide-button" id="reset-button" type="button">↻ СБРОСИТЬ ПРОГРЕСС</button></section>
+      <section class="panel"><div class="section-heading"><div><p class="section-kicker">KEYBOARD</p><h2>Горячие клавиши</h2></div><span class="heading-icon">⌨️</span></div><div class="shortcut-list"><div><kbd>Пробел</kbd><span>Погладить котика</span></div><div><kbd>N</kbd><span>День / ночь</span></div><div><kbd>L</kbd><span>Следующий мир</span></div><div><kbd>M</kbd><span>Звук</span></div><div><kbd>Esc</kbd><span>Закрыть окно или выйти из полноэкранного режима</span></div></div></section>
+    </section>
+
+
+    <section class="view" id="view-town"><div class="page-heading"><p class="section-kicker">06 / CAT CITY</p><h2>Город котиков</h2><p>Исследуй районы, находи подарки и встречай жителей.</p></div><div class="feature-grid" id="town-grid"></div><div class="panel"><h3>🗺️ Карта города</h3><p id="town-message">Выбери район, чтобы отправиться туда.</p><button class="pixel-button primary-button" id="town-explore">🔎 Исследовать район</button></div></section>
+    <section class="view" id="view-cafe"><div class="page-heading"><p class="section-kicker">07 / CAT CAFÉ</p><h2>Кошачье кафе</h2><p>Обслуживай гостей, улучшай кафе и собирай прибыль.</p></div><div class="cafe-scene panel"><div class="cafe-art">☕ 🐈 🍰</div><h3 id="cafe-rank">Кафе «Мяу-латте» · уровень 1</h3><p>Репутация: <strong id="cafe-rep">0</strong> · Монеты: <strong id="cafe-coins">0</strong></p><div class="button-row"><button class="pixel-button primary-button" id="serve-customer">🍰 Обслужить гостя</button><button class="pixel-button secondary-button" id="upgrade-cafe">⬆ Улучшить кафе · 80 ◆</button></div><p id="cafe-message" aria-live="polite">Гости уже идут!</p></div></section>
+    <section class="view" id="view-room"><div class="page-heading"><p class="section-kicker">08 / MY HOME</p><h2>Моя комната</h2><p>Перетаскивай украшения по комнате. Положение сохраняется.</p></div><div class="room-canvas panel" id="room-canvas"><div class="room-window">☀</div><div class="room-item" draggable="true" data-item="🛏️" style="left:12%;top:54%">🛏️</div><div class="room-item" draggable="true" data-item="🪴" style="left:72%;top:52%">🪴</div><div class="room-item" draggable="true" data-item="🧸" style="left:48%;top:67%">🧸</div><div class="room-item" draggable="true" data-item="💡" style="left:80%;top:20%">💡</div></div><div class="panel"><h3>Добавить мебель</h3><div class="button-row"><button class="pixel-button secondary-button" data-furniture="🪑">🪑 Стул</button><button class="pixel-button secondary-button" data-furniture="🌸">🌸 Цветок</button><button class="pixel-button secondary-button" data-furniture="📚">📚 Книги</button><button class="pixel-button secondary-button" data-furniture="🐟">🐟 Игрушка</button></div><button class="pixel-button primary-button" id="room-reset">Вернуть мебель на места</button></div></section>
+    <section class="view" id="view-companions"><div class="page-heading"><p class="section-kicker">09 / FRIENDS</p><h2>Котики и компаньоны</h2><p>Открывай новых друзей, меняй характер и собирай воспоминания.</p></div><div class="feature-grid" id="companion-grid"></div><div class="panel"><h3>📔 Дневник воспоминаний</h3><div id="memory-list"></div></div><div class="panel"><h3>🎭 Характер котика</h3><select id="cat-personality" class="notification-select"><option>Ласковый</option><option>Игривый</option><option>Любопытный</option><option>Соня</option><option>Непоседа</option></select><button class="pixel-button primary-button" id="save-personality">Сохранить характер</button><p id="personality-message"></p></div></section>
+    <section class="view" id="view-photo"><div class="page-heading"><p class="section-kicker">10 / PHOTO STUDIO</p><h2>Фотостудия</h2><p>Создавай снимки своего мира и сохраняй их в альбом.</p></div><div class="photo-frame" id="photo-frame"><div class="photo-stickers" id="photo-stickers">✦ ♡ ✦</div><div class="photo-cat">🐈</div><h3 id="photo-caption">Мой лучший друг</h3><p>PIXEL CAT CLUB ♥</p></div><div class="panel"><label for="photo-text">Подпись к фото</label><input id="photo-text" class="photo-input" maxlength="42" value="Мой лучший друг"><div class="button-row"><button class="pixel-button secondary-button" id="photo-decor">✨ Сменить украшения</button><button class="pixel-button primary-button" id="photo-save">📸 Сохранить в альбом</button></div><button class="pixel-button secondary-button" id="photo-download">⬇ Скачать открытку PNG</button></div><div class="panel"><h3>📚 Альбом</h3><div class="feature-grid" id="photo-album"></div></div></section>
+    <section class="view" id="view-events"><div class="page-heading"><p class="section-kicker">11 / SEASONAL EVENTS</p><h2>Сезонные события</h2><p>Праздничные задания, редкие предметы и особые награды.</p></div><div class="feature-grid" id="event-grid"></div><div class="panel"><h3>🎁 Секретный сундук</h3><p id="chest-status">В сундуке спрятана награда.</p><button class="pixel-button primary-button" id="open-chest">Открыть сундук · 25 ◆</button></div></section>
+
+    <p class="save-note" id="save-note" aria-live="polite">♡ Игра готова к приключениям!</p>
+  </main>
+
+  <footer class="site-footer"><p>MADE WITH <span>♥</span> AND CAT HAIR</p><p class="footer-small">PIXEL CAT CLUB · VERSION 5.1 QUALITY DELUXE</p></footer>
+
+  <nav class="bottom-nav" aria-label="Навигация по игре">
+    <button class="nav-item active" data-view="view-game" type="button"><span>🐈</span><small>Игра</small></button>
+    <button class="nav-item" data-view="view-cat" type="button"><span>🎨</span><small>Котик</small></button>
+    <button class="nav-item" data-view="view-shop" type="button"><span>🎀</span><small>Магазин</small></button>
+    <button class="nav-item" data-view="view-worlds" type="button"><span>🌍</span><small>Миры</small></button>
+    <button class="nav-item" data-view="view-quests" type="button"><span>🏆</span><small>Квесты</small></button>
+    <button class="nav-item" data-view="view-more" type="button"><span>⚙️</span><small>Ещё</small></button>
+
+    <button class="nav-item" data-view="view-town" type="button"><span>🏙️</span><small>Город</small></button><button class="nav-item" data-view="view-cafe" type="button"><span>☕</span><small>Кафе</small></button><button class="nav-item" data-view="view-room" type="button"><span>🛋️</span><small>Комната</small></button><button class="nav-item" data-view="view-companions" type="button"><span>🐾</span><small>Друзья</small></button><button class="nav-item" data-view="view-photo" type="button"><span>📸</span><small>Фото</small></button><button class="nav-item" data-view="view-events" type="button"><span>🎉</span><small>События</small></button>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <div class="modal-backdrop" id="welcome-modal" hidden><section class="modal-card welcome-card" role="dialog" aria-modal="true" aria-labelledby="welcome-title"><div class="modal-pixel-icon">ฅ^•ﻌ•^ฅ</div><p class="section-kicker">WELCOME TO</p><h2 id="welcome-title">PIXEL CAT CLUB</h2><p>Твой котик ждёт поглаживаний, подарков и приключений. За поглаживания получай опыт и монетки!</p><button class="pixel-button primary-button wide-button" id="welcome-start" type="button">НАЧАТЬ ИГРУ ♥</button></section></div>
+
+  <div class="modal-backdrop" id="minigame-modal" hidden><section class="modal-card minigame-card" role="dialog" aria-modal="true" aria-labelledby="minigame-title"><div class="modal-heading"><div><p class="section-kicker">PIXEL ARCADE</p><h2 id="minigame-title">Лови вкусняшки!</h2></div><button class="icon-button" id="minigame-close" type="button" aria-label="Закрыть мини-игру">✕</button></div><div id="minigame-intro"><p>У тебя 20 секунд. Лови рыбки или мышек кликами и зарабатывай монетки!</p><div class="minigame-choice"><button class="pixel-button primary-button" id="start-fish" type="button">🐟 ЛОВИТЬ РЫБУ</button><button class="pixel-button secondary-button" id="start-mouse" type="button">🐭 ЛОВИТЬ МЫШЕЙ</button></div></div><div id="minigame-arena-wrap" hidden><div class="minigame-stats"><span>ВРЕМЯ: <strong id="minigame-time">20</strong></span><span>ПОПАДАНИЯ: <strong id="minigame-score">0</strong></span></div><div class="minigame-arena" id="minigame-arena"><button class="mini-target" id="mini-target" type="button" aria-label="Поймать предмет">🐟</button></div><button class="pixel-button secondary-button wide-button" id="minigame-stop" type="button">ЗАКОНЧИТЬ РАУНД</button></div><div id="minigame-result" hidden><h3>РАУНД ЗАВЕРШЁН!</h3><p id="minigame-result-text">Хорошая игра!</p><p id="minigame-record-message"></p><button class="pixel-button primary-button wide-button" id="minigame-again" type="button">ИГРАТЬ ЕЩЁ</button></div></section></div>
+  <footer class="creator-credit" aria-label="Автор игры">
+    <span>PIXEL CAT CLUB</span><span class="creator-heart" aria-hidden="true">♥</span><span>создатель <a href="https://github.com/Blooody11" target="_blank" rel="noopener noreferrer">@Blooody11</a></span>
+  </footer>
 </body>
 </html>

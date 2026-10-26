@@ -1,0 +1,13 @@
+{
+  "name": "Pixel Cat Club",
+  "short_name": "Pixel Cat",
+  "description": "Уютная пиксельная игра с котиком",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fff4f8",
+  "theme_color": "#ffb8d2",
+  "icons": [
+    { "src": "./cat-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
